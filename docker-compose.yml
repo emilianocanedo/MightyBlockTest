@@ -1,0 +1,50 @@
+version: '3'
+services:
+  redis:
+    image: "redis:alpine"
+
+  # API services
+  web-api:
+    build:
+      context: .
+      dockerfile: etc/Dockerfile.api
+    environment:
+      - DEBUG=true
+      - ENVIRONMENT=docker
+      - FLASK_ENV=development
+      - SQLALCHEMY_DATABASE_HOST=postgres:6667
+      - SQLALCHEMY_DATABASE_PASS=dbadmin
+      - SQLALCHEMY_DATABASE_USER=dbadmin
+      - SQLALCHEMY_DATABASE_NAME=mighty
+      - TESTING=true
+    volumes:
+      - ./src:/code/src
+    depends_on:
+      - alembic
+    ports:
+      - "5000:5000"
+    command: ["local"]
+
+  alembic:
+    # Run alembic after postgres is started
+    build:
+        context: .
+        dockerfile: etc/Dockerfile.alembic
+    depends_on:
+        - postgres
+    volumes:
+        - ./src/model:/model
+
+  postgres:
+    image: postgres:alpine
+    environment:
+        - POSTGRES_USER=dbadmin
+        - POSTGRES_PASSWORD=dbadmin
+        - POSTGRES_MULTIPLE_DATABASES=mighty
+        - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+        - ./pgdata:/var/lib/postgresql/data/pgdata
+        - ./docker_db_init.d:/docker-entrypoint-initdb.d
+        - ./src/model:/model
+    ports:
+        - "6667:6667"

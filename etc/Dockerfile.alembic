@@ -1,0 +1,18 @@
+# Already has pandas pre-compiled on it
+FROM amancevice/pandas:0.25.3-alpine
+WORKDIR /
+
+COPY ./requirements.txt requirements.txt
+COPY etc/exports_alembic.docker.ini exports_alembic.ini
+
+RUN set -ex
+RUN apk update
+RUN apk add --no-cache build-base postgresql-libs gcc libffi-dev musl-dev postgresql-dev linux-headers git
+RUN python3 -m ensurepip
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+RUN pip3 install -U pip setuptools wheel
+RUN pip3 install -r requirements.txt
+
+COPY bin/entrypoint.alembic.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

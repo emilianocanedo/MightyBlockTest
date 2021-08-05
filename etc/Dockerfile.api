@@ -1,0 +1,23 @@
+# Already has pandas pre-compiled on it
+FROM amancevice/pandas:0.25.3-alpine
+
+RUN \
+    apk update && \
+    apk add --no-cache build-base postgresql-libs && \
+    apk add --no-cache gcc libffi-dev musl-dev postgresql-dev linux-headers bash python3 gnupg git
+RUN ln -sf python3 /usr/bin/python
+RUN python3 -m ensurepip
+RUN pip3 install --no-cache --upgrade pip setuptools
+
+WORKDIR /code
+ADD . /code
+
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+RUN pip install -U pip setuptools wheel gunicorn
+RUN pip install -r requirements.txt
+
+COPY bin/entrypoint_api.sh /entrypoint_api.sh
+RUN chmod a+x /entrypoint_api.sh
+RUN ls /
+ENTRYPOINT ["/entrypoint_api.sh"]
+CMD ["local"]
