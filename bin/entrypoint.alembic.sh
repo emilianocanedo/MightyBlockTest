@@ -2,7 +2,7 @@
 
 set -ex
 
-TRY_LOOP="20"
+TRY_LOOP="2"
 
 wait_for_port() {
   local name="$1" host="$2" port="$3"
