@@ -42,7 +42,9 @@ class Session(Resource):
             200: 'Success',
             401: 'Not authorized'
         }, description='''
-            Get Session Token
+            Get Session Token. This will be valid for 1 hour.
+            In order to use the 'post' endpoints, you need to provide an Authorization header like:
+            Authorization: Bearer <TOKEN>
         '''
     )
     def post(self):
