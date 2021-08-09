@@ -44,7 +44,8 @@ class GetPosts(Resource):
             401: 'Not authorized',
             422: 'Missing query string'
         }, description='''
-            Get all posts
+            Get all posts. Also, you can get the output pagination using the query strings:
+            ?page=&rows_per_page=
         '''
     )
     def get(self):
